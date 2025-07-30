@@ -1,0 +1,11 @@
+fastapi[standard]
+sqlalchemy
+uvicorn
+pydantic
+httpx
+psycopg2-binary
+itsdangerous
+jose
+python-jose
+passlib
+bcrypt
