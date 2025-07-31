@@ -14,11 +14,9 @@ class UserSignUp(BaseModel):
         class Success(BaseModel):
             message: str
             user_id: str
-            jwt_token: str
 
         class Error(BaseModel):
-            error: str
-            details: str
+            message: str
             status: int
 
 
@@ -33,6 +31,5 @@ class UserLogin(BaseModel):
             user_id: str
 
         class Error(BaseModel):
-            error: str
-            details: str
+            message: str
             status: int
