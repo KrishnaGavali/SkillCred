@@ -70,7 +70,7 @@ const Navbar = () => {
           {theme === "dark" ? (
             <Sun className="w-5 h-5 text-amber-500 group-hover:rotate-12 group-hover:scale-110 transition-all" />
           ) : (
-            <Moon className="w-5 h-5 text-slate-700 group-hover:-rotate-12 group-hover:scale-110 transition-all" />
+            <Moon className="w-5 h-5 text-blue-700 group-hover:-rotate-12 group-hover:scale-110 transition-all" />
           )}
         </button>
         <Link
@@ -97,7 +97,7 @@ const Navbar = () => {
       <AnimatePresence mode="wait">
         {isMobileMenuOpen && (
           <motion.div
-            className="absolute top-full left-0 w-full bg-background dark:bg-background border-t border-border-color shadow-md md:hidden z-40"
+            className="absolute top-full left-0 w-full bg-background dark:bg-background border-t border-border-color shadow-md md:hidden z-40 dark:shadow-gray-800"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
