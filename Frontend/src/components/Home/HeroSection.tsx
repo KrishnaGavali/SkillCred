@@ -1,3 +1,4 @@
+import { MoveRight } from "lucide-react";
 import React from "react";
 
 const HeroSection = () => {
@@ -20,9 +21,11 @@ const HeroSection = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <button className="px-6 py-3 bg-foreground text-primary-foreground rounded-lg hover:bg-primary-dark transition font-medium w-full sm:w-auto">
-            Scan My Profile →
+          <button className="group px-6 py-3 bg-foreground text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-300 font-semibold w-full sm:w-auto flex items-center gap-2">
+            <span className="relative z-10">Scan My Profile</span>
+            <MoveRight className="w-4 h-4 transform transition-all duration-300 opacity-100 md:translate-x-0 md:opacity-0 group-hover:translate-x-1 group-hover:opacity-100" />
           </button>
+
           <button className="px-6 py-3 border border-primary text-primary rounded-lg hover:bg-muted transition font-medium w-full sm:w-auto">
             See Sample Report
           </button>

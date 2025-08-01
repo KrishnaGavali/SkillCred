@@ -1,52 +1,146 @@
 "use client";
 
-import React from "react";
-import { Sun, Moon, Menu } from "lucide-react";
+import React, { useState } from "react";
+import Link from "next/link";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../../context/themToggle";
+import { AnimatePresence, motion } from "motion/react";
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
-  const [selectedSection, setSelectedSection] = React.useState("applicants");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   React.useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
   return (
-    <nav className="backdrop-blur-xl bg-background dark:bg-background border border-border-color p-2 flex items-center justify-between transition-all duration-500 ease-out w-[90%] sticky top-0 z-50">
-      <div className="flex items-center">
-        <span className="relative text-2xl font-bold tracking-tight">
-          <span className="text-primary-500 dark:text-primary-400">
-            SkillCred
-          </span>
-        </span>
+    <nav className="sticky top-0 z-50 bg-background dark:bg-background border border-border-color backdrop-blur-md px-6 py-3 flex items-center justify-between w-[90%]">
+      {/* Brand Logo */}
+      <Link href="/" className="text-2xl font-extrabold text-primary">
+        SkillCred
+      </Link>
+
+      {/* Desktop Navigation Links */}
+      <div className="hidden md:flex items-center gap-x-14 text-sm font-medium text-primary">
+        <Link
+          href="/how-it-works"
+          className="relative group inline-block text-primary"
+        >
+          <span className="relative z-10">How it Works</span>
+          <span
+            className="absolute left-0 -bottom-0.5 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full"
+            aria-hidden="true"
+          />
+        </Link>
+        <Link
+          href="/sample-report"
+          className="relative group inline-block text-primary"
+        >
+          <span className="relative z-10">Sample Report</span>
+          <span
+            className="absolute left-0 -bottom-0.5 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full"
+            aria-hidden="true"
+          />
+        </Link>
+        <Link
+          href="/pricing"
+          className="relative group inline-block text-primary"
+        >
+          <span className="relative z-10">Pricing</span>
+          <span
+            className="absolute left-0 -bottom-0.5 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full"
+            aria-hidden="true"
+          />
+        </Link>
       </div>
 
-      {/* Right Controls */}
-      <div className="flex items-center space-x-3">
+      {/* Right Controls (Theme + Mobile Menu) */}
+      <div className="flex items-center space-x-3 md:space-x-4">
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="group relative p-3 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-300 ease-out hover:scale-105 border border-border-color"
+          className="group p-2 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition border border-border-color"
           aria-label="Toggle theme"
         >
-          <div className="relative w-5 h-5">
-            {theme === "dark" ? (
-              <Sun className="w-5 h-5 text-amber-500 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110" />
-            ) : (
-              <Moon className="w-5 h-5 text-slate-700 transition-all duration-300 group-hover:-rotate-12 group-hover:scale-110" />
-            )}
-          </div>
+          {theme === "dark" ? (
+            <Sun className="w-5 h-5 text-amber-500 group-hover:rotate-12 group-hover:scale-110 transition-all" />
+          ) : (
+            <Moon className="w-5 h-5 text-slate-700 group-hover:-rotate-12 group-hover:scale-110 transition-all" />
+          )}
         </button>
-
-        {/* Menu Icon */}
-        <button
-          className="group relative p-3 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-300 border border-border-color"
-          aria-label="Open menu"
+        <Link
+          href="/login"
+          className="px-4 py-2 border border-primary rounded-md hover:bg-primary hover:text-white dark:hover:text-primary-foreground transition duration-200 hidden md:inline-block text-primary font-medium"
         >
-          <Menu className="w-5 h-5 text-slate-700 dark:text-slate-300 group-hover:scale-125 transition-transform duration-300" />
+          Login
+        </Link>
+
+        {/* Mobile Menu Icon */}
+        <button
+          onClick={toggleMobileMenu}
+          className="md:hidden group p-2 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition border border-border-color"
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? (
+            <X className="w-5 h-5 text-primary-700 group-hover:scale-125 transition-transform" />
+          ) : (
+            <Menu className="w-5 h-5 text-primary-700 group-hover:scale-125 transition-transform" />
+          )}
         </button>
       </div>
+
+      <AnimatePresence mode="wait">
+        {isMobileMenuOpen && (
+          <motion.div
+            className="absolute top-full left-0 w-full bg-background dark:bg-background border-t border-border-color shadow-md md:hidden z-40"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            <div className="flex flex-col divide-y divide-border-color text-sm font-medium text-primary">
+              {/* Menu Links */}
+              <Link
+                href="/how-it-works"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-6 py-4 w-full text-left hover:bg-accent transition-colors"
+              >
+                How it Works
+              </Link>
+              <Link
+                href="/sample-report"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-6 py-4 w-full text-left hover:bg-accent transition-colors"
+              >
+                Sample Report
+              </Link>
+              <Link
+                href="/pricing"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-6 py-4 w-full text-left hover:bg-accent transition-colors"
+              >
+                Pricing
+              </Link>
+
+              {/* Login Button */}
+              <div className="px-6 py-4 border-b border-border-color">
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full text-center border border-primary rounded-md px-4 py-2 hover:bg-primary hover:text-white dark:hover:text-primary-foreground transition font-medium"
+                >
+                  Login
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
