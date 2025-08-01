@@ -22,8 +22,8 @@ const SectionSwitch = () => {
               className={`px-4 py-1.5 text-sm rounded-full transition-all duration-300 font-medium
                 ${
                   selectedSection === section
-                    ? "bg-black text-white dark:bg-white dark:text-black shadow-md"
-                    : "text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                    ? " bg-foreground text-primary-foreground"
+                    : " "
                 }`}
             >
               {section === "applicants" ? (

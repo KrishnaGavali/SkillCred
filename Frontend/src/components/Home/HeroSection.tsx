@@ -20,7 +20,7 @@ const HeroSection = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-dark transition font-medium w-full sm:w-auto">
+          <button className="px-6 py-3 bg-foreground text-primary-foreground rounded-lg hover:bg-primary-dark transition font-medium w-full sm:w-auto">
             Scan My Profile →
           </button>
           <button className="px-6 py-3 border border-primary text-primary rounded-lg hover:bg-muted transition font-medium w-full sm:w-auto">
