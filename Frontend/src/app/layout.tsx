@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "../../context/themToggle";
-import { Inter } from "next/font/google";
+import { Fira_Code, Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import SectionSwitch from "@/components/SectionSwitch";
 
 const InterSans = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const FiraCode = Fira_Code({
+  subsets: ["latin"],
+  variable: "--font-fira-code",
 });
 
 export const metadata: Metadata = {
@@ -23,13 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${InterSans.className} antialiased flex flex-col items-center justify-start `}
+        className={`${FiraCode.className} antialiased flex flex-col items-center justify-start `}
       >
         <SectionSwitch />
         <ThemeProvider>
           <Navbar />
+          <div className=" w-[90%]">{children}</div>
         </ThemeProvider>
-        <div className=" w-[90%]">{children}</div>
       </body>
     </html>
   );

@@ -1,13 +1,7 @@
-import React from "react";
-import HeroSection from "@/components/Home/HeroSection";
+import { redirect } from "next/navigation";
 
-const page = () => {
-  return (
-    <div>
-      <HeroSection />
-      <div className=" h-screen"></div>
-    </div>
-  );
+const Page = () => {
+  redirect("/applicant");
 };
 
-export default page;
+export default Page;

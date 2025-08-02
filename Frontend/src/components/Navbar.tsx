@@ -2,21 +2,24 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Sun, Moon, Menu, X } from "lucide-react";
-import { useTheme } from "../../context/themToggle";
+import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { usePathname } from "next/navigation";
+import ThemeChanger from "./ThemeChanger";
 
 const Navbar = () => {
-  const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  React.useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+  const pathname = usePathname();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
+
+  const hiddenRoutes = ["/login", "/get-started"];
+
+  if (hiddenRoutes.includes(pathname)) {
+    return null;
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-background dark:bg-background border border-border-color backdrop-blur-md px-6 py-3 flex items-center justify-between w-[90%]">
@@ -61,18 +64,7 @@ const Navbar = () => {
 
       {/* Right Controls (Theme + Mobile Menu) */}
       <div className="flex items-center space-x-3 md:space-x-4">
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          className="group p-2 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition border border-border-color"
-          aria-label="Toggle theme"
-        >
-          {theme === "dark" ? (
-            <Sun className="w-5 h-5 text-amber-500 group-hover:rotate-12 group-hover:scale-110 transition-all" />
-          ) : (
-            <Moon className="w-5 h-5 text-blue-700 group-hover:-rotate-12 group-hover:scale-110 transition-all" />
-          )}
-        </button>
+        <ThemeChanger />
         <Link
           href="/login"
           className="px-4 py-2 border border-primary rounded-md hover:bg-primary hover:text-white dark:hover:text-primary-foreground transition duration-200 hidden md:inline-block text-primary font-medium"
