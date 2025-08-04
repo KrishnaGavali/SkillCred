@@ -22,10 +22,11 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-background dark:bg-background border border-border-color backdrop-blur-md px-6 py-3 flex items-center justify-between w-[90%]">
+    <nav className="sticky top-0 z-50 bg-background/45 backdrop-blur-md border border-border-color px-2.5 py-3 flex items-center justify-between w-[90%]">
       {/* Brand Logo */}
-      <Link href="/" className="text-2xl font-extrabold text-primary">
+      <Link href="/" className="text-lg font-extrabold text-primary">
         SkillCred
+        <span className="text-xs text-primary"> [Applicants]</span>
       </Link>
 
       {/* Desktop Navigation Links */}

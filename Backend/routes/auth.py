@@ -6,19 +6,22 @@ from utils.Auth.hash_pass_handler import hash_password, verify_password
 from utils.Auth.jwt_handler import create_jwt
 from models.user import User
 from email_validator import validate_email, EmailNotValidError
-import uuid
 
 authRouter = APIRouter(
     tags=["Authentication"], responses={404: {"description": "Not found"}}
 )
 
 
-@authRouter.post("/signup", description="API endpoint for user signup")
+@authRouter.post(
+    "/signup",
+    description="API endpoint for user signup",
+    response_model=UserSignUp.Response.Success,
+)
 async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
     try:
-        # Email format validation
+        # Validate email format
         try:
-            validated_email = validate_email(
+            validated_email: str = validate_email(
                 body.email, check_deliverability=False
             ).email
         except EmailNotValidError as e:
@@ -30,8 +33,10 @@ async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
                 ).model_dump(),
             )
 
-        # Check for existing user
-        existing_user = db.query(User).filter(User.email == validated_email).first()
+        # Check if user exists
+        existing_user: User | None = (
+            db.query(User).filter(User.email == validated_email).first()
+        )
         if existing_user:
             raise HTTPException(
                 status_code=400,
@@ -41,44 +46,30 @@ async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
                 ).model_dump(),
             )
 
-        # Generate unique user ID
-        random_id = f"{body.name.lower().replace(' ', '_')}_{uuid.uuid4().hex[:8]}"
+        # Hash password and create user
+        hashed_password: str = hash_password(body.password)
+        new_user = User(email=validated_email, password=hashed_password)
 
-        # Hash the password securely
-        hashed_password = hash_password(body.password)
-
-        # Create the new user instance
-        new_user = User(
-            id=random_id,
-            name=body.name,
-            email=validated_email,
-            password=hashed_password,
-            profile_picture=body.profile_picture,
-            github_username=body.github_username,
-        )
-
-        # Create JWT payload
-        jwt_payload = {
-            "user_id": new_user.id,
-            "email": validated_email,
-        }
-        jwt_token = create_jwt(jwt_payload, expires_in=60)
-
-        # Save to database
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
 
-        # Prepare secure response
+        # JWT payload and token
+        jwt_payload: dict[str, str] = {
+            "user_id": str(new_user.id),
+            "email": validated_email,
+        }
+        jwt_token: str = create_jwt(jwt_payload, expires_in=60)
+
+        # Response with secure cookie
         response = JSONResponse(
             content=UserSignUp.Response.Success(
                 message="User created successfully",
-                user_id=new_user.id,
+                user_id=str(new_user.id),
             ).model_dump(),
             status_code=201,
         )
 
-        # Secure cookie (HTTPOnly, SameSite)
         response.set_cookie(
             key="jwt_token",
             value=jwt_token,
@@ -91,8 +82,9 @@ async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
 
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
         db.rollback()
+        print(f"Error during signup: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=UserSignUp.Response.Error(
@@ -102,12 +94,16 @@ async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
         )
 
 
-@authRouter.post("/login", description="API endpoint for user login")
+@authRouter.post(
+    "/login",
+    description="API endpoint for user login",
+    response_model=UserLogin.Response.Success,
+)
 async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
     try:
-        # Email format validation
+        # Validate email format
         try:
-            validated_email = validate_email(
+            validated_email: str = validate_email(
                 body.email, check_deliverability=False
             ).email
         except EmailNotValidError as e:
@@ -120,7 +116,7 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
             )
 
         # Fetch user
-        user = db.query(User).filter(User.email == validated_email).first()
+        user: User | None = db.query(User).filter(User.email == validated_email).first()
         if not user:
             raise HTTPException(
                 status_code=404,
@@ -141,17 +137,17 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
             )
 
         # Create JWT
-        jwt_payload = {
-            "user_id": user.id,
+        jwt_payload: dict[str, str] = {
+            "user_id": str(user.id),
             "email": user.email,
         }
-        jwt_token = create_jwt(jwt_payload, expires_in=60)
+        jwt_token: str = create_jwt(jwt_payload, expires_in=60)
 
-        # Secure response
+        # Response with secure cookie
         response = JSONResponse(
             content=UserLogin.Response.Success(
                 message="User logged in successfully",
-                user_id=user.id,
+                user_id=str(user.id),
             ).model_dump(),
             status_code=200,
         )
@@ -168,8 +164,9 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
 
     except HTTPException:
         raise
-    except Exception:
+    except Exception as e:
         db.rollback()
+        print(f"Error during login: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=UserLogin.Response.Error(

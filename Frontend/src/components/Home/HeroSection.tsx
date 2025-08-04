@@ -6,7 +6,7 @@ const HeroSection = () => {
     <section className="flex flex-col md:flex-row items-start md:items-center text-left border-x border-b border-border-color mx-auto p-6 bg-background md:h-[80vh] md:justify-between space-y-6 md:space-y-0 w-full">
       {/* Text Section */}
       <div className="flex flex-col items-start justify-center w-full md:w-1/2 space-y-4">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-black dark:text-white hidden md:block">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-black dark:text-white hidden lg:block">
           SkillCred
         </h1>
 
@@ -15,8 +15,8 @@ const HeroSection = () => {
         </h2>
 
         <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 max-w-xl">
-          Upload your resume and GitHub. Let AI show you what recruiters really
-          see — with clear, personalized feedback and improvement paths.
+          Upload your resume and GitHub. Get AI-driven feedback, improvement
+          tips, and see where you rank on the SkillCred leaderboard.
         </p>
 
         {/* CTA Buttons */}

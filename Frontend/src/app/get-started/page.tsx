@@ -2,7 +2,7 @@
 import ThemeChanger from "@/components/ThemeChanger";
 import Link from "next/link";
 import React, { useState } from "react";
-import { Github } from "lucide-react";
+import SignUpGithub from "@/components/GetStarted/SignUpGithub";
 
 const GetStartedPage = () => {
   const [email, setEmail] = useState("");
@@ -12,11 +12,6 @@ const GetStartedPage = () => {
     e.preventDefault();
     // TODO: Handle actual login
     console.log({ email, password });
-  };
-
-  const handleGithubLogin = () => {
-    // TODO: Implement GitHub OAuth login
-    console.log("Login with GitHub");
   };
 
   return (
@@ -91,15 +86,7 @@ const GetStartedPage = () => {
             </button>
           </form>
 
-          <div className="w-full flex items-center justify-center">
-            <button
-              onClick={handleGithubLogin}
-              className="flex items-center justify-center w-full py-3 px-6 border border-border-color rounded-lg bg-background text-foreground hover:bg-primary/10 transition-all duration-300"
-            >
-              <Github className="w-5 h-5 mr-2" />
-              SignUp with GitHub
-            </button>
-          </div>
+          <SignUpGithub />
 
           <p className="text-sm text-muted-foreground">
             have an account?{" "}
