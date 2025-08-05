@@ -1,5 +1,4 @@
 from uuid import UUID, uuid4
-from enum import Enum
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID

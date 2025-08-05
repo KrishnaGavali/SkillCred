@@ -188,7 +188,10 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
         if not token or len(token) < 20:
             raise HTTPException(
                 status_code=400,
-                detail="Invalid GitHub code format",
+                detail=UserSignUp.Response.Error(
+                    message="Invalid GitHub OAuth token",
+                    status=400,
+                ).model_dump(),
             )
 
         # Step 1: Exchange GitHub OAuth code for access token
@@ -205,7 +208,10 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
         if response.status_code != 200:
             raise HTTPException(
                 status_code=response.status_code,
-                detail="Failed to exchange GitHub code",
+                detail=UserSignUp.Response.Error(
+                    message="Failed to exchange GitHub code for access token",
+                    status=response.status_code,
+                ).model_dump(),
             )
 
         access_token = response.json().get("access_token")
@@ -215,7 +221,10 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
         if not access_token:
             raise HTTPException(
                 status_code=400,
-                detail="Access token not found in response",
+                detail=UserSignUp.Response.Error(
+                    message="Invalid or Expired GitHub OAuth token",
+                    status=400,
+                ).model_dump(),
             )
 
         # Step 2: Use PyGithub to fetch user data
@@ -225,9 +234,11 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
         github = Github(auth=auth)
         gh_user = github.get_user()
 
+        print(f"GitHub User: {gh_user.login}")  # Debugging line
+
         # Extract user data
         email = gh_user.email or ""  # Email might be None
-        repos_url = gh_user.repos_url
+
         username = gh_user.login
         name = gh_user.name
         profile_url = gh_user.html_url
@@ -238,12 +249,14 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
         new_user = User(
             email=email,
             github_access_token=access_token,
-            github_repo_url=repos_url,
+            is_profile_complete=False,
         )
 
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+
+        id = str(new_user.id)
 
         return JSONResponse(
             content={
@@ -253,7 +266,8 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
                     "username": username,
                     "name": name,
                     "profile_url": profile_url,
-                    "repos_url": repos_url,
+                    "repos_url": "",
+                    "userId": id,
                 },
             },
             status_code=200,
@@ -263,4 +277,10 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
         raise
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=UserSignUp.Response.Error(
+                message=f"Internal server error: {str(e)}",
+                status=500,
+            ).model_dump(),
+        )

@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*", // Match all /api routes
-        destination: "http://localhost:8000/:path*", // Proxy to localhost:800
+        source: "/api/:path*",
+        destination: "http://localhost:8000/api/:path*", // Added /api/ to match backend routes
       },
     ];
   },
