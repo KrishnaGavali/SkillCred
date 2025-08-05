@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useTheme } from "../../context/themToggle";
+import { useTheme } from "../context/themToggle";
 import { Moon, Sun } from "lucide-react";
 
 const ThemeChanger = () => {

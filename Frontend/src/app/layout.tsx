@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "../../context/themToggle";
+import { ThemeProvider } from "../context/themToggle";
 import { Fira_Code, Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import SectionSwitch from "@/components/SectionSwitch";

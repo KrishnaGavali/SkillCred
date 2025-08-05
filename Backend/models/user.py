@@ -20,7 +20,9 @@ class User(Base):
     )
 
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
-    password: Mapped[str] = mapped_column(String)
+    password: Mapped[str] = mapped_column(String, nullable=True)
+    github_access_token: Mapped[str] = mapped_column(String, nullable=True)
+    github_repo_url: Mapped[str] = mapped_column(String, nullable=True)
 
 
 class UserRole(str, Enum):

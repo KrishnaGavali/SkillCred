@@ -6,6 +6,8 @@ from utils.Auth.hash_pass_handler import hash_password, verify_password
 from utils.Auth.jwt_handler import create_jwt
 from models.user import User
 from email_validator import validate_email, EmailNotValidError
+import requests
+import os
 
 authRouter = APIRouter(
     tags=["Authentication"], responses={404: {"description": "Not found"}}
@@ -174,3 +176,68 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
                 status=500,
             ).model_dump(),
         )
+
+
+@authRouter.post(
+    "/github/set-token",
+    description="API endpoint to exchange GitHub code for access token and fetch user data",
+)
+async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
+    try:
+        if not token or len(token) < 20:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid GitHub code format",
+            )
+
+        # Step 1: Exchange code for access token
+        req = requests.post(
+            url="https://github.com/login/oauth/access_token",
+            data={
+                "client_id": os.getenv("AUTH_GITHUB_ID"),
+                "client_secret": os.getenv("AUTH_GITHUB_SECRET"),
+                "code": token,
+            },
+            headers={"Accept": "application/json"},
+        )
+
+        if req.status_code != 200:
+            raise HTTPException(
+                status_code=req.status_code,
+                detail="Failed to exchange GitHub code",
+            )
+
+        access_token = req.json().get("access_token")
+        if not access_token:
+            raise HTTPException(
+                status_code=400,
+                detail="Access token not found in response",
+            )
+
+        # Step 2: Use the access token to get user info
+        user_info = requests.get(
+            url="https://api.github.com/user",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/vnd.github.v3+json",
+            },
+        )
+
+        if user_info.status_code != 200:
+            raise HTTPException(
+                status_code=user_info.status_code,
+                detail="Failed to fetch user info from GitHub",
+            )
+
+        user_data = user_info.json()
+
+        return JSONResponse(
+            content={
+                "message": "GitHub access token and user info received",
+                "user_data": user_data,
+            },
+            status_code=200,
+        )
+
+    except HTTPException:
+        raise
