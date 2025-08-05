@@ -6,6 +6,7 @@ from utils.Auth.hash_pass_handler import hash_password, verify_password
 from utils.Auth.jwt_handler import create_jwt
 from models.user import User
 from email_validator import validate_email, EmailNotValidError
+from github import Github, Auth
 import requests
 import os
 
@@ -190,8 +191,8 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
                 detail="Invalid GitHub code format",
             )
 
-        # Step 1: Exchange code for access token
-        req = requests.post(
+        # Step 1: Exchange GitHub OAuth code for access token
+        response = requests.post(
             url="https://github.com/login/oauth/access_token",
             data={
                 "client_id": os.getenv("AUTH_GITHUB_ID"),
@@ -201,43 +202,65 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
             headers={"Accept": "application/json"},
         )
 
-        if req.status_code != 200:
+        if response.status_code != 200:
             raise HTTPException(
-                status_code=req.status_code,
+                status_code=response.status_code,
                 detail="Failed to exchange GitHub code",
             )
 
-        access_token = req.json().get("access_token")
+        access_token = response.json().get("access_token")
+
+        print(f"Access Token: {access_token}")  # Debugging line
+
         if not access_token:
             raise HTTPException(
                 status_code=400,
                 detail="Access token not found in response",
             )
 
-        # Step 2: Use the access token to get user info
-        user_info = requests.get(
-            url="https://api.github.com/user",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Accept": "application/vnd.github.v3+json",
-            },
+        # Step 2: Use PyGithub to fetch user data
+
+        auth = Auth.Token(access_token)
+
+        github = Github(auth=auth)
+        gh_user = github.get_user()
+
+        # Extract user data
+        email = gh_user.email or ""  # Email might be None
+        repos_url = gh_user.repos_url
+        username = gh_user.login
+        name = gh_user.name
+        profile_url = gh_user.html_url
+
+        # Optional: you could pull repos or public stats here too
+
+        # Step 3: Save to DB
+        new_user = User(
+            email=email,
+            github_access_token=access_token,
+            github_repo_url=repos_url,
         )
 
-        if user_info.status_code != 200:
-            raise HTTPException(
-                status_code=user_info.status_code,
-                detail="Failed to fetch user info from GitHub",
-            )
-
-        user_data = user_info.json()
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
 
         return JSONResponse(
             content={
                 "message": "GitHub access token and user info received",
-                "user_data": user_data,
+                "user_data": {
+                    "email": email,
+                    "username": username,
+                    "name": name,
+                    "profile_url": profile_url,
+                    "repos_url": repos_url,
+                },
             },
             status_code=200,
         )
 
     except HTTPException:
         raise
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
