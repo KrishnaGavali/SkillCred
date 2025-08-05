@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import api from "@/api/axios";
+import { useAuth } from "@/context/authContext";
 
 type Message = {
   type: "processing" | "error" | "success";
@@ -15,6 +17,8 @@ const GithubCallback = () => {
     type: "processing",
     text: "Processing your request...",
   });
+
+  const { setIsAuthenticated } = useAuth();
 
   const [countdown, setCountdown] = useState(5);
 
@@ -37,7 +41,24 @@ const GithubCallback = () => {
 
     if (code) {
       console.log("GitHub OAuth code received:", code);
-      // TODO: Send `code` to backend to complete OAuth flow
+
+      const response = api.post(`/auth/github/set-token?token=${code}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      response.then((res) => {
+        if (res.status === 200) {
+          setMessage({
+            type: "success",
+            text: "GitHub authentication successful!",
+          });
+        }
+      });
+
+      setIsAuthenticated(true);
+
       setMessage({
         type: "processing",
         text: "Received code. Redirecting...",

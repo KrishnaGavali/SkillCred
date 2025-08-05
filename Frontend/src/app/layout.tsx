@@ -4,6 +4,7 @@ import { ThemeProvider } from "../context/themToggle";
 import { Fira_Code, Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import SectionSwitch from "@/components/SectionSwitch";
+import AuthProvider from "@/context/authContext";
 
 const InterSans = Inter({
   subsets: ["latin"],
@@ -31,10 +32,12 @@ export default function RootLayout({
         className={`${FiraCode.className} antialiased flex flex-col items-center justify-start `}
       >
         <SectionSwitch />
-        <ThemeProvider>
-          <Navbar />
-          <div className=" w-[90%]">{children}</div>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <Navbar />
+            <div className=" w-[90%]">{children}</div>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

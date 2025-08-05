@@ -18,8 +18,6 @@ from database import Base  # ✅ Assuming your own declarative Base from databas
 
 
 # -------------------- USER MODEL --------------------
-
-
 class User(Base):
     __tablename__ = "users"
 
@@ -46,8 +44,6 @@ class User(Base):
 
 
 # -------------------- USER PROFILE MODEL --------------------
-
-
 class UserProfile(Base):
     __tablename__ = "user_profiles"
 
