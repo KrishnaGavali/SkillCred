@@ -69,6 +69,7 @@ async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
             content=UserSignUp.Response.Success(
                 message="User created successfully",
                 user_id=str(new_user.id),
+                email=validated_email,
             ).model_dump(),
             status_code=201,
         )
@@ -129,6 +130,15 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
                 ).model_dump(),
             )
 
+        if not user.password:
+            raise HTTPException(
+                status_code=400,
+                detail=UserLogin.Response.Error(
+                    message="Login through this authentication method is not allowed",
+                    status=400,
+                ).model_dump(),
+            )
+
         # Verify password
         if not verify_password(body.password, user.password):
             raise HTTPException(
@@ -151,6 +161,7 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
             content=UserLogin.Response.Success(
                 message="User logged in successfully",
                 user_id=str(user.id),
+                email=str(validate_email),
             ).model_dump(),
             status_code=200,
         )
@@ -244,6 +255,11 @@ async def set_github_token(token: str, db: db_dependency) -> JSONResponse:
         profile_url = gh_user.html_url
 
         # Optional: you could pull repos or public stats here too
+
+        existing_user: User | None = db.query(User).filter(User.email == email).first()
+
+        if existing_user:
+            return JSONResponse(content={})
 
         # Step 3: Save to DB
         new_user = User(

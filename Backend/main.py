@@ -7,6 +7,7 @@ import os
 from database import test_connection, engine
 from models import user
 from routes.auth import authRouter
+from routes.scan import scanRouter
 
 # Load environment variables
 load_dotenv()
@@ -36,6 +37,7 @@ app.add_middleware(
 api_router = APIRouter()
 
 api_router.include_router(authRouter, prefix="/auth", tags=["Authentication"])
+api_router.include_router(scanRouter, prefix="/scan", tags=["Scan"])
 
 # Include routers AFTER creating the app
 app.include_router(api_router, prefix="/api")

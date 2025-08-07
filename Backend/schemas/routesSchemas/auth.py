@@ -10,6 +10,7 @@ class UserSignUp(BaseModel):
         class Success(BaseModel):
             message: str
             user_id: str
+            email: str
 
         class Error(BaseModel):
             message: str
@@ -25,6 +26,7 @@ class UserLogin(BaseModel):
         class Success(BaseModel):
             message: str
             user_id: str
+            email: str
 
         class Error(BaseModel):
             message: str
