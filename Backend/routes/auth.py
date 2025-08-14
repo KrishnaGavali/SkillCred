@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from database import db_dependency
 from schemas.routesSchemas.auth import UserSignUp, UserLogin
 from utils.Auth.hash_pass_handler import hash_password, verify_password
-from utils.Auth.jwt_handler import create_jwt
+from utils.Auth.jwt_handler import create_jwt, verify_jwt
 from models.user import User
 from email_validator import validate_email, EmailNotValidError
 from github import Github, Auth
@@ -78,8 +78,8 @@ async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
             key="jwt_token",
             value=jwt_token,
             httponly=True,
-            secure=True,
-            samesite="lax",
+            secure=False,
+            samesite="none",
         )
 
         return response
@@ -161,7 +161,7 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
             content=UserLogin.Response.Success(
                 message="User logged in successfully",
                 user_id=str(user.id),
-                email=str(validate_email),
+                email=str(validated_email),
             ).model_dump(),
             status_code=200,
         )
@@ -170,8 +170,8 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
             key="jwt_token",
             value=jwt_token,
             httponly=True,
-            secure=True,
-            samesite="lax",
+            secure=False,
+            samesite="none",
         )
 
         return response
@@ -187,6 +187,46 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
                 message="Internal server error",
                 status=500,
             ).model_dump(),
+        )
+
+
+@authRouter.post(
+    "/verify",
+    description="API endpoint to verify user authentication",
+    response_model=UserLogin.Response.Success,
+)
+async def verify_user(request: Request) -> JSONResponse:
+    try:
+        jwt_token = request.cookies.get("jwt_token")
+
+        if not jwt_token:
+            raise HTTPException(
+                status_code=401,
+                detail=UserLogin.Response.Error(
+                    message="Authentication token is missing",
+                    status=401,
+                ).model_dump(),
+            )
+
+        # Here you would typically decode the JWT and verify it
+
+        user_data = verify_jwt(jwt_token)
+
+        return JSONResponse(
+            content=UserLogin.Response.Success(
+                user_id=user_data.get("user_id", ""),
+                email=user_data.get("email", "") or "",
+                message="User is authenticated",
+            ).model_dump(),
+            status_code=200,
+        )
+    except HTTPException as e:
+        return JSONResponse(
+            content=UserLogin.Response.Error(
+                message="Authentication failed" + str(e.detail),
+                status=401,
+            ).model_dump(),
+            status_code=401,
         )
 
 

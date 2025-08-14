@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Github, Check, X } from "lucide-react";
 import api from "@/api/axios";
 import { AnimatePresence, motion } from "motion/react";
+import { redirect } from "next/navigation";
 
 enum MessageStatus {
   Loading = "loading",
@@ -46,6 +47,12 @@ const LoginPage = () => {
         status: MessageStatus.Success,
         message: "Login successful!",
       });
+
+      const timeout = setTimeout(() => {
+        redirect(`/applicant/${response.data.user_id}/complete-profile`);
+      }, 2000);
+
+      return () => clearTimeout(timeout); // cleanup on unmount or re-run
 
       // TODO: Handle navigation or token storage
     } catch (err: unknown) {
