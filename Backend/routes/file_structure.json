@@ -1,0 +1,380 @@
+{
+  "name": "TypeStrike",
+  "type": "dir",
+  "children": [
+    {
+      "name": ".vscode",
+      "type": "dir",
+      "children": []
+    },
+    {
+      "name": "Backend",
+      "type": "dir",
+      "children": [
+        {
+          "name": "Controllers",
+          "type": "dir",
+          "children": [
+            {
+              "name": "auth.controller.js",
+              "type": "file"
+            },
+            {
+              "name": "typing.controller.js",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "Models",
+          "type": "dir",
+          "children": [
+            {
+              "name": "typingResult.model.js",
+              "type": "file"
+            },
+            {
+              "name": "user.model.js",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "Routes",
+          "type": "dir",
+          "children": [
+            {
+              "name": "auth.routes.js",
+              "type": "file"
+            },
+            {
+              "name": "typing.routes.js",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "database.js",
+          "type": "file"
+        },
+        {
+          "name": "index.js",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "Frontend",
+      "type": "dir",
+      "children": [
+        {
+          "name": "Layout.jsx",
+          "type": "file"
+        },
+        {
+          "name": "README.md",
+          "type": "file"
+        },
+        {
+          "name": "eslint.config.js",
+          "type": "file"
+        },
+        {
+          "name": "index.html",
+          "type": "file"
+        },
+        {
+          "name": "postcss.config.js",
+          "type": "file"
+        },
+        {
+          "name": "public",
+          "type": "dir",
+          "children": []
+        },
+        {
+          "name": "src",
+          "type": "dir",
+          "children": [
+            {
+              "name": "App.css",
+              "type": "file"
+            },
+            {
+              "name": "App.jsx",
+              "type": "file"
+            },
+            {
+              "name": "Components",
+              "type": "dir",
+              "children": [
+                {
+                  "name": "Friends",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "Friends.css",
+                      "type": "file"
+                    },
+                    {
+                      "name": "Friends.js",
+                      "type": "file"
+                    },
+                    {
+                      "name": "Friends.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "MultiplayerTyping",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "GameOver.jsx",
+                      "type": "file"
+                    },
+                    {
+                      "name": "GamePosition.jsx",
+                      "type": "file"
+                    },
+                    {
+                      "name": "MultiplayerTyping.css",
+                      "type": "file"
+                    },
+                    {
+                      "name": "MultiplayerTyping.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "Navbar",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "Navbar.css",
+                      "type": "file"
+                    },
+                    {
+                      "name": "Navbar.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "RoomLobbyComponents",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "RoomUserInfo.jsx",
+                      "type": "file"
+                    },
+                    {
+                      "name": "UserJoinedInfo.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "TypingBox",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "TypingBox.css",
+                      "type": "file"
+                    },
+                    {
+                      "name": "TypingBox.jsx",
+                      "type": "file"
+                    },
+                    {
+                      "name": "saveTypingResult.js",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "TypingHistory",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "TypingHistory.css",
+                      "type": "file"
+                    },
+                    {
+                      "name": "TypingHistory.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "TypingResult",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "ResultChart.jsx",
+                      "type": "file"
+                    },
+                    {
+                      "name": "TypingResult.css",
+                      "type": "file"
+                    },
+                    {
+                      "name": "TypingResult.jsx",
+                      "type": "file"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Routes",
+              "type": "dir",
+              "children": [
+                {
+                  "name": "AboutUs.jsx",
+                  "type": "file"
+                },
+                {
+                  "name": "Compete.jsx",
+                  "type": "file"
+                },
+                {
+                  "name": "Login.jsx",
+                  "type": "file"
+                },
+                {
+                  "name": "Play.jsx",
+                  "type": "file"
+                },
+                {
+                  "name": "Profile.jsx",
+                  "type": "file"
+                },
+                {
+                  "name": "Register.jsx",
+                  "type": "file"
+                },
+                {
+                  "name": "RoomLobby.jsx",
+                  "type": "file"
+                }
+              ]
+            },
+            {
+              "name": "context",
+              "type": "dir",
+              "children": [
+                {
+                  "name": "AuthContext",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "AuthContext.js",
+                      "type": "file"
+                    },
+                    {
+                      "name": "AuthContextProvider.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "GameOverContext",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "GameOverContext.js",
+                      "type": "file"
+                    },
+                    {
+                      "name": "GameOverContextProvider.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "StartGame",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "StartGameContext.js",
+                      "type": "file"
+                    },
+                    {
+                      "name": "StartGameContextProvider.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "TestTimeContext",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "TestTimeContext.js",
+                      "type": "file"
+                    },
+                    {
+                      "name": "TestTimeContextProvider.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "UserStatsContext",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "UserStatsContext.js",
+                      "type": "file"
+                    },
+                    {
+                      "name": "UserStatsContextProvider.jsx",
+                      "type": "file"
+                    }
+                  ]
+                },
+                {
+                  "name": "UsersContext",
+                  "type": "dir",
+                  "children": [
+                    {
+                      "name": "UsersContext.js",
+                      "type": "file"
+                    },
+                    {
+                      "name": "UsersContextProvider.jsx",
+                      "type": "file"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "index.css",
+              "type": "file"
+            },
+            {
+              "name": "main.jsx",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "tailwind.config.js",
+          "type": "file"
+        },
+        {
+          "name": "vite.config.js",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "name": "README.md",
+      "type": "file"
+    }
+  ]
+}

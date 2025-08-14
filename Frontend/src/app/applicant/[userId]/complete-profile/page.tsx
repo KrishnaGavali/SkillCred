@@ -7,7 +7,6 @@ import React, { useState } from "react";
 const ProfileFormPage = () => {
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [role, setRole] = useState<string>("");
 
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -26,9 +25,6 @@ const ProfileFormPage = () => {
     if (profilePic) {
       formData.append("profile_picture", profilePic);
     }
-
-    // Append selected role
-    formData.append("role", role);
 
     // You can POST this to your backend now
     const response = await fetch("/api/profile", {
@@ -137,67 +133,6 @@ const ProfileFormPage = () => {
               className="px-4 py-2 border rounded-md"
             />
           </div>
-
-          {/* Role Selector */}
-          <div className="flex flex-col md:col-span-2">
-            <label className="mb-2 font-medium">Role</label>
-            <div className="flex gap-4 flex-wrap">
-              {["student", "fresher"].map((value) => (
-                <label key={value} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="role"
-                    value={value}
-                    checked={role === value}
-                    onChange={(e) => setRole(e.target.value)}
-                  />
-                  <span>
-                    {value
-                      .replace("_", " ")
-                      .replace(/\b\w/g, (c) => c.toUpperCase())}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Conditional Field: Student → Year */}
-          {role === "student" && (
-            <div className="flex flex-col md:col-span-2">
-              <label htmlFor="year" className="mb-1 font-medium">
-                Current Year of Study
-              </label>
-              <select
-                name="year"
-                id="year"
-                className="px-4 py-2 border border-border-color rounded-md"
-                required
-              >
-                <option value="">Select year</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-            </div>
-          )}
-
-          {/* Conditional Field: Fresher → Experience */}
-          {role === "fresher" && (
-            <div className="flex flex-col md:col-span-2">
-              <label htmlFor="experience" className="mb-1 font-medium">
-                Experience (months)
-              </label>
-              <input
-                name="experience"
-                id="experience"
-                type="number"
-                min={0}
-                placeholder="e.g. 6"
-                className="px-4 py-2 border border-border-color rounded-md"
-              />
-            </div>
-          )}
 
           {/* College */}
           <div className="flex flex-col">

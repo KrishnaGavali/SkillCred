@@ -1,18 +1,80 @@
 "use client";
 import ThemeChanger from "@/components/ThemeChanger";
 import Link from "next/link";
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { Check, X } from "lucide-react";
+import api from "@/api/axios";
 import SignUpGithub from "@/components/GetStarted/SignUpGithub";
+import { redirect } from "next/navigation";
+
+enum MessageStatus {
+  Loading = "loading",
+  Success = "success",
+  Error = "error",
+  None = "none",
+}
+
+type Message = {
+  status: MessageStatus;
+  message: string | null;
+};
+
+interface SignupResponse {
+  message: string;
+  user_id: string;
+}
 
 const GetStartedPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<Message>({
+    status: MessageStatus.None,
+    message: null,
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Handle actual login
-    console.log({ email, password });
+    setMessage({ status: MessageStatus.Loading, message: "Signing up..." });
+    try {
+      const response = await api.post<SignupResponse>("/auth/signup", {
+        email: email.trim(),
+        password,
+      });
+      setMessage({
+        status: MessageStatus.Success,
+        message: response.data.message || "Signup successful!",
+      });
+
+      setTimeout(() => {
+        redirect("/applicant/123/complete-profile");
+      }, 2000);
+    } catch (err: unknown) {
+      let errorMsg = "An error occurred";
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err &&
+        (err as any).response?.data?.detail?.message
+      ) {
+        errorMsg = (err as any).response.data.detail.message;
+      }
+      setMessage({
+        status: MessageStatus.Error,
+        message: errorMsg,
+      });
+    }
   };
+
+  // Toast auto-hide logic
+  useEffect(() => {
+    if (message.status === MessageStatus.None) return;
+    const timer = setTimeout(() => {
+      setMessage({ status: MessageStatus.None, message: null });
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [message]);
 
   return (
     <>
@@ -43,7 +105,39 @@ const GetStartedPage = () => {
             SignUp to SkillCred
           </h2>
 
-          <form onSubmit={handleLogin} className="w-full space-y-4">
+          <form onSubmit={handleSignup} className="w-full space-y-4">
+            <AnimatePresence>
+              {message.status !== MessageStatus.None && (
+                <motion.div
+                  key="toast"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 30 }}
+                  transition={{ duration: 0.3 }}
+                  className="fixed bottom-3 right-1.5 md:right-5 bg-background p-2 rounded-lg text-black dark:text-white flex items-center gap-x-2 w-fit border border-border-color shadow-lg"
+                >
+                  {message.status === MessageStatus.Loading ? (
+                    <>
+                      <div
+                        className="h-5 w-5 border-4 border-t-transparent border-gray-700 rounded-full animate-spin"
+                        aria-label="Loading spinner"
+                      />
+                      <p className="text-black">{message.message}</p>
+                    </>
+                  ) : message.status === MessageStatus.Success ? (
+                    <>
+                      <Check className="h-5 w-5 text-green-500" />
+                      <p className="text-green-500">{message.message}</p>
+                    </>
+                  ) : (
+                    <>
+                      <X className="h-5 w-5 text-red-500" />
+                      <p className="text-red-500">{message.message}</p>
+                    </>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
             <div className="flex flex-col space-y-2">
               <label
                 htmlFor="email"

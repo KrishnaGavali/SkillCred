@@ -1,17 +1,73 @@
 "use client";
 import ThemeChanger from "@/components/ThemeChanger";
 import Link from "next/link";
-import React, { useState } from "react";
-import { Github } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Github, Check, X } from "lucide-react";
+import api from "@/api/axios";
+import { AnimatePresence, motion } from "motion/react";
+
+enum MessageStatus {
+  Loading = "loading",
+  Success = "success",
+  Error = "error",
+  None = "none",
+}
+
+type Message = {
+  status: MessageStatus;
+  message: string | null;
+};
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<Message>({
+    status: MessageStatus.None,
+    message: null,
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Handle actual login
-    console.log({ email, password });
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault(); // prevent reload first
+
+    setMessage({
+      status: MessageStatus.Loading,
+      message: "Please wait...",
+    });
+
+    try {
+      const response = await api.post("/auth/login", {
+        email: email.trim(),
+        password: password,
+      });
+
+      console.log(response.data);
+
+      setMessage({
+        status: MessageStatus.Success,
+        message: "Login successful!",
+      });
+
+      // TODO: Handle navigation or token storage
+    } catch (err: unknown) {
+      console.error(err);
+
+      let errorMsg = "An error occurred";
+
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err &&
+        (err as any).response?.data?.detail
+      ) {
+        errorMsg =
+          (err as any).response.data.detail.message || "An error occurred";
+      }
+
+      setMessage({
+        status: MessageStatus.Error,
+        message: errorMsg,
+      });
+    }
   };
 
   const handleGithubLogin = () => {
@@ -19,9 +75,23 @@ const LoginPage = () => {
     console.log("Login with GitHub");
   };
 
+  // Toast auto-hide logic
+  useEffect(() => {
+    if (message.status === MessageStatus.None) return;
+
+    const timer = setTimeout(() => {
+      setMessage({
+        status: MessageStatus.None,
+        message: null,
+      });
+    }, 3000);
+
+    return () => clearTimeout(timer); // cleanup on re-run or unmount
+  }, [message]);
+
   return (
     <>
-      <div className=" w-full h-12 border border-border-color sticky top-0 bg-background flex items-center justify-between px-6">
+      <div className="w-full h-12 border border-border-color sticky top-0 bg-background flex items-center justify-between px-6">
         <Link href="/" className="text-2xl font-extrabold text-primary">
           SkillCred
         </Link>
@@ -112,6 +182,39 @@ const LoginPage = () => {
           </p>
         </div>
       </section>
+
+      <AnimatePresence>
+        {message.status !== MessageStatus.None && (
+          <motion.div
+            key="toast"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-3 right-1.5 md:right-5 bg-background p-2 rounded-lg text-black dark:text-white flex items-center gap-x-2 w-fit border border-border-color shadow-lg"
+          >
+            {message.status === MessageStatus.Loading ? (
+              <>
+                <div
+                  className="h-5 w-5 border-4 border-t-transparent border-gray-700 rounded-full animate-spin"
+                  aria-label="Loading spinner"
+                />
+                <p className="text-black">{message.message}</p>
+              </>
+            ) : message.status === MessageStatus.Success ? (
+              <>
+                <Check className="h-5 w-5 text-green-500" />
+                <p className="text-green-500">{message.message}</p>
+              </>
+            ) : (
+              <>
+                <X className="h-5 w-5 text-red-500" />
+                <p className="text-red-500">{message.message}</p>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

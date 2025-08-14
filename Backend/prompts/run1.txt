@@ -17,8 +17,6 @@ Return a detailed **JSON object** that represents your analysis of the project�
 * Are frontend and backend clearly separated (if applicable)?
 * Is sensitive information managed through environment variables or hardcoded?
 
-> ⚠️ Focus especially on **backend logic-heavy components** like services, controllers, and models. Also check if critical logic lacks corresponding test files.
-
 #### 🔹 Documentation
 
 Evaluate both the **presence** and **quality** of:
@@ -67,22 +65,11 @@ In `README.md`, check:
   },
   "summary": "A brief overall impression of the repository structure, strengths, and concerns.",
   "files_to_check": [
-    {
-      "label": "Backend API and Services",
-      "paths": ["backend/api/userController.js", "backend/services/authService.js"]
-    },
-    {
-      "label": "Backend Models and Utils",
-      "paths": ["backend/models/User.js", "backend/utils/tokenManager.js"]
-    },
-    {
-      "label": "Frontend Components",
-      "paths": ["frontend/components/Dashboard.jsx"]
-    },
-    {
-      "label": "Dependency and Config",
-      "paths": ["package.json", ".env.example"]
-    }
+    [file1_path, file2_path],  // Group files logically
+    [file3_path],
+    [file4_path, file5_path] // like this group them
+    
+    // Add more paths as needed, ensuring checking all the files, but group the file which are logically related and it will help lower llm calls
   ],
   "documentation": {
     "has_readme": true,
