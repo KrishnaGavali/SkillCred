@@ -7,6 +7,4 @@ const api: AxiosInstance = axios.create({
   },
 });
 
-api.defaults.withCredentials = true; // Enable cookies for cross-origin requests
-
 export default api;

@@ -6,6 +6,7 @@ import { Github, Check, X } from "lucide-react";
 import api from "@/api/axios";
 import { AnimatePresence, motion } from "motion/react";
 import { redirect } from "next/navigation";
+import { useAuth } from "@/context/authContext";
 
 enum MessageStatus {
   Loading = "loading",
@@ -20,12 +21,13 @@ type Message = {
 };
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [emailText, setEmailText] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<Message>({
     status: MessageStatus.None,
     message: null,
   });
+  const { setIsAuthenticated, setEmail, setUserId, setAuthToken } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // prevent reload first
@@ -36,8 +38,10 @@ const LoginPage = () => {
     });
 
     try {
+      console.log("Logging in with:", { email: emailText, password });
+
       const response = await api.post("/auth/login", {
-        email: email.trim(),
+        email: emailText.trim(),
         password: password,
       });
 
@@ -47,6 +51,13 @@ const LoginPage = () => {
         status: MessageStatus.Success,
         message: "Login successful!",
       });
+
+      setIsAuthenticated(true);
+      setEmail(response.data.email);
+      setUserId(response.data.user_id);
+      setAuthToken?.(response.data.auth_token);
+
+      localStorage.setItem("authTokenSkillCred", response.data.auth_token);
 
       const timeout = setTimeout(() => {
         redirect(`/applicant/${response.data.user_id}/complete-profile`);
@@ -136,9 +147,9 @@ const LoginPage = () => {
               <input
                 type="email"
                 id="email"
-                value={email}
+                value={emailText}
                 required
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmailText(e.target.value)}
                 className="px-4 py-2 border border-border-color rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>

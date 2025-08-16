@@ -10,9 +10,19 @@ const ProtectRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        const response = await api.post("/auth/verify");
+        const response = await api.post(
+          "/auth/verify",
+          {},
+          {
+            headers: {
+              Authorization: localStorage.getItem("authTokenSkillCred") || "",
+            },
+          }
+        );
         if (response.status === 200) {
           setIsAuthenticated(true);
+          setEmail(response.data.user_data.email);
+          setUserId(response.data.user_data.user_id);
         }
         console.log("User is authenticated :", response);
 
@@ -21,7 +31,7 @@ const ProtectRoute = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         console.error("Authentication check failed:", error);
         setIsAuthenticated(false);
-        redirect("/login");
+        redirect("/invalid");
       }
     };
 

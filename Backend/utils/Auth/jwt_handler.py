@@ -25,6 +25,12 @@ def verify_jwt(token: str) -> dict[str, Any]:
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError as e:
-        raise ValueError("Invalid or expired token") from e
+        return {
+            "success": True,
+            "userData": payload,
+        }
+
+    except JWTError:
+        return {
+            "success": False,
+        }

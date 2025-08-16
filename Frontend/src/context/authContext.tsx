@@ -1,4 +1,5 @@
 "use client";
+import api from "@/api/axios";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 type AuthContextType = {
@@ -8,6 +9,8 @@ type AuthContextType = {
   setEmail: (value: string) => void;
   userId: string | null;
   setUserId: (value: string) => void;
+  authToken?: string;
+  setAuthToken?: (value: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,11 +21,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [email, setEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const token = localStorage.getItem("authTokenSkillCred");
     if (token) {
       setIsAuthenticated(true);
+      setAuthToken(token);
+
+      const response = api
+        .post(
+          "/api/auth/verify",
+          {},
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        )
+        .then((res) => {
+          if (res.data.userData) {
+            setEmail(res.data.user_data.email);
+            setUserId(res.data.user_data.user_id);
+          }
+        });
     } else {
       setIsAuthenticated(false);
     }
@@ -36,6 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setEmail,
         userId,
         setUserId,
+        authToken,
+        setAuthToken,
       }}
     >
       {children}

@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import JSONResponse
 from database import db_dependency
-from schemas.routesSchemas.auth import UserSignUp, UserLogin
+from schemas.routesSchemas.auth import UserSignUp, UserLogin, UserVerify
 from utils.Auth.hash_pass_handler import hash_password, verify_password
 from utils.Auth.jwt_handler import create_jwt, verify_jwt
 from models.user import User
 from email_validator import validate_email, EmailNotValidError
 from github import Github, Auth
+from typing import Annotated
 import requests
 import os
 
@@ -70,16 +71,9 @@ async def signup(body: UserSignUp.Body, db: db_dependency) -> JSONResponse:
                 message="User created successfully",
                 user_id=str(new_user.id),
                 email=validated_email,
+                auth_token=jwt_token,
             ).model_dump(),
             status_code=201,
-        )
-
-        response.set_cookie(
-            key="jwt_token",
-            value=jwt_token,
-            httponly=True,
-            secure=False,
-            samesite="none",
         )
 
         return response
@@ -162,16 +156,9 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
                 message="User logged in successfully",
                 user_id=str(user.id),
                 email=str(validated_email),
+                auth_token=jwt_token,
             ).model_dump(),
             status_code=200,
-        )
-
-        response.set_cookie(
-            key="jwt_token",
-            value=jwt_token,
-            httponly=True,
-            secure=False,
-            samesite="none",
         )
 
         return response
@@ -190,44 +177,31 @@ async def login(body: UserLogin.Body, db: db_dependency) -> JSONResponse:
         )
 
 
-@authRouter.post(
-    "/verify",
-    description="API endpoint to verify user authentication",
-    response_model=UserLogin.Response.Success,
-)
-async def verify_user(request: Request) -> JSONResponse:
-    try:
-        jwt_token = request.cookies.get("jwt_token")
+@authRouter.post("/verify")
+async def verify_user(
+    Authorization: Annotated[str, Header()],
+) -> JSONResponse:
 
-        if not jwt_token:
+    try:
+        jwt_token = Authorization
+        response = verify_jwt(jwt_token)
+
+        if response.get("success") is False:
             raise HTTPException(
-                status_code=401,
-                detail=UserLogin.Response.Error(
-                    message="Authentication token is missing",
-                    status=401,
-                ).model_dump(),
+                status_code=401, detail={"message": "Invalid or expired token"}
             )
 
-        # Here you would typically decode the JWT and verify it
-
-        user_data = verify_jwt(jwt_token)
-
         return JSONResponse(
-            content=UserLogin.Response.Success(
-                user_id=user_data.get("user_id", ""),
-                email=user_data.get("email", "") or "",
-                message="User is authenticated",
-            ).model_dump(),
+            content={
+                "success": True,
+                "message": "User is authenticated",
+                "user_data": response.get("userData", {}),
+            },
             status_code=200,
         )
-    except HTTPException as e:
-        return JSONResponse(
-            content=UserLogin.Response.Error(
-                message="Authentication failed" + str(e.detail),
-                status=401,
-            ).model_dump(),
-            status_code=401,
-        )
+
+    except HTTPException:
+        raise
 
 
 @authRouter.post(
